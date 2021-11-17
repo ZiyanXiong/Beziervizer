@@ -3,12 +3,42 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 
-var barHeight = Math.ceil(height / data.length);
 
-svg.selectAll('rect')
-  .data(data)
-  .enter().append('rect')
-    .attr('width', function(d) { return d * width; })
-    .attr('height', barHeight)
-    .attr('y', function(d, i) { return i * barHeight; })
-    .attr('fill', 'steelblue');
+
+radius = 32;
+
+  const circles = d3.range(4).map(i => ({
+    x: Math.random() * (width - radius * 2) + radius,
+    y: Math.random() * (height - radius * 2) + radius,
+  }));
+
+  svg.selectAll("circle")
+    .data(circles)
+    .join("circle")
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y)
+      .attr("r", radius)
+      .attr("fill", (d, i) => d3.schemeCategory10[i % 10])
+      .call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended)
+      .on("start.update drag.update end.update", update));
+
+
+
+  function dragstarted(event, d) {
+    d3.select(this).raise().attr("stroke", "black");
+  }
+
+  function dragged(event, d) {
+    d3.select(this).attr("cx", d.x = event.x).attr("cy", d.y = event.y);
+  }
+
+  function dragended(event, d) {
+    d3.select(this).attr("stroke", null);
+  }
+
+  function update() {
+
+  }
