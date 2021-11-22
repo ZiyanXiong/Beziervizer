@@ -1,12 +1,12 @@
 Package: Beziervizer
 Title: An R package for plotting interactive Bezier curves
 Version: 0.0.0.9000
-Authors@R: 
-    person("Ziyan", "Xiong", "zyxing@tamu.edu", role = c("aut", "cre"))
+Authors@R: person("Ziyan", "Xiong",email = "zyxiong@tamu.edu", role = c("aut", "cre"))
 Description: This package provides functions for plotting interactive bezier curves. Users can adjust various parameters in the plotted reuslts and see how the Bezier curve will change according to the change in each parameter. 
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
-    r2d3
+    r2d3,
+    shiny
