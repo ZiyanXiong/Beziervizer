@@ -2,10 +2,13 @@
 % Please edit documentation in R/Cubic_Bezier_Curve.R
 \name{plot_cubic_bezier}
 \alias{plot_cubic_bezier}
-\title{Title}
+\title{Plot a cubic Bezier curve}
 \usage{
 plot_cubic_bezier()
 }
 \description{
-Title
+This function will lunch a Shiny app for plotting an interactive Bezier curve. The slider t controls the animation of De Casteljau's algorithm. The coordinates of each control points will be printed out on each movement.
+}
+\examples{
+#plot_cubic_bezier()
 }
