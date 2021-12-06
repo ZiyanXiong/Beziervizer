@@ -5,8 +5,8 @@
 
 const radius = 6;
 var n = 100;
-var omega = 3;
-
+var t = 0.5;
+var omega = t * 2;
 var circles_input = [{x: 100, y:400}, {x: 300, y:600}, {x: 500, y:400}];
 var circles = circles_input.map(d => ({x: d.y - 400, y: d.x-200, z:100}));
 circles[1].z = circles[1].z * omega;
@@ -16,6 +16,18 @@ var origin = [{x:circles[1].x, y:circles[1].y, z:0}];
 var camera_matrix = [[0.0000000,  1.0000000,  0.0000000, -300.0000000],
                         [0.0000000,  0.0000000, 1.0000000, -300.0000000],
                         [-1.0000000, 0.0000000,  0.0000000, 900.0000000]];
+
+var margin = {right: 50, left: 50};
+width = svg.attr("width") - margin.left - margin.right;
+height = svg.attr("height");
+var timer;
+
+var x = d3.scaleLinear()
+    .domain([0, 2])
+    .range([0, width])
+    .clamp(true);
+
+var handle_position = [{x: t * width, y:0}];
 
 if(data.length >= 4){
   circles = data;
@@ -141,6 +153,14 @@ function update() {
 
   curve = quadratic_bezier_curve(n);
   control_points = circles.map(multiply_camera_matrix);
+
+  svg.select("#control_points").selectAll("line")
+    .data(control_points)
+      .attr("x1", d => d.x)
+      .attr("y1", d => d.y)
+      .attr("x2", function(d,i){if(i < 2){return control_points[i+1].x} else {return d.x}})
+      .attr("y2", function(d,i){if(i < 2){return control_points[i+1].y} else {return d.y}});
+
   svg.select("#control_points").selectAll("circle")
     .data(control_points)
       .attr("cx", d => d.x)
@@ -181,14 +201,17 @@ function update() {
 
   if(omega > 1){
   svg.select("#rational").raise();
+  svg.select("#control_points").raise();
   }else{
   svg.select("#rational").lower();
+  svg.select("#control_points").lower();
   }
   svg.select("#intersects").selectAll("circle")
     .data(camera_rational_curve)
       .attr("cx", d => d.x)
       .attr("cy", d => d.y)
   svg.select("#bezier").raise();
+
 }
 
 var path = d3.path();
@@ -251,6 +274,17 @@ svg.select("#bezier").selectAll("circle")
       .on("end", dragended)
       .on("start.update drag.update end.update", update));
 
+svg.select("#control_points").selectAll("line")
+    .data(control_points)
+    .join("line")
+      .attr("x1", d => d.x)
+      .attr("y1", d => d.y)
+      .attr("x2", function(d,i){if(i < 2){return control_points[i+1].x} else {return d.x}})
+      .attr("y2", function(d,i){if(i < 2){return control_points[i+1].y} else {return d.y}})
+      .attr("stroke", d3.schemeCategory10[0])
+      .attr("stroke-width", "2.5px")
+      .attr("opacity", "0.8");
+
 svg.select("#control_points").selectAll("circle")
     .data(control_points)
     .join("circle")
@@ -258,6 +292,8 @@ svg.select("#control_points").selectAll("circle")
       .attr("cy", d => d.y)
       .attr("r", 6)
       .attr("fill", (d, i) => d3.schemeCategory10[4])
+      .attr("stroke", "black")
+      .style("opacity", "0.5");
 
 var axis_nodes = svg.select("#axis").selectAll("path")
     .data(axis_lines)
@@ -351,3 +387,133 @@ if(omega > 1){
 }
 svg.select("#intersects").raise();
 svg.select("#bezier").raise();
+
+
+
+var slider = svg.append("g")
+    .attr("class", "slider")
+    .attr("transform", "translate(" + margin.left + "," + height * 0.9 + ")");
+
+slider.append("text")
+      .attr("class","t")
+      .attr("transform", "translate(" + width / 2 + "," + 65 + ")")
+      .style("font", "25px sans-serif")
+      .style("text-anchor", "middle")
+      .style("user-select", "none")
+      .text("w: " + (t * 2).toFixed(2));
+
+var play_button = slider.append("g")
+      .attr("class", "button")
+      .attr("transform", "translate(0," + 40 + ")");
+
+play_button.append("text")
+        .attr("x", 35)
+        .attr("y", 22)
+        .style("font", "18px sans-serif")
+        .style("text-anchor", "middle")
+        .style("user-select", "none")
+        .text("Play");
+
+play_button.append("rect")
+      .attr('width', 70)
+      .attr('height', 30)
+      .attr('fill', "#ffad8a")
+      .attr("stroke", "black")
+      .style("opacity", 0.3)
+      .on("mousedown", function(){d3.select(this).attr('fill', "#6e6060")})
+      .on("mouseup", function(){d3.select(this).attr('fill', "#ffad8a")})
+      .on("click", onClick);
+
+slider.append("line")
+    .attr("class", "track-inset")
+    .attr("x1", x.range()[0])
+    .attr("x2", t * width)
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("stroke", "#3b99fc")
+    .attr("stroke-width", "10px")
+    .attr("stroke-linecap", "round");
+
+slider.append("line")
+    .attr("class", "track-overlay")
+    .attr("x1", t * width)
+    .attr("x2", x.range()[1])
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("stroke", "#cccccc")
+    .attr("stroke-width", "10px")
+    .attr("stroke-linecap", "round");
+
+slider.insert("g")
+    .attr("transform", "translate(0," + 25 + ")")
+  .selectAll("text")
+  .data(x.ticks(10))
+  .enter().append("text")
+    .style("font", "15px sans-serif")
+    .attr("x", x)
+    .style("text-anchor", "middle")
+    .style("user-select", "none")
+    .text(function(d) { return d; });
+
+var handle = slider.selectAll("circle")
+    .data(handle_position)
+    .join("circle")
+      .attr("cx", d => d.x)
+      .attr("cy", d => d.y)
+      .attr("r", 8)
+      .attr("fill", "white")
+      .attr("stroke", "gray")
+      .call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", handle_dragged)
+      .on("end", handle_dragended)
+      .on("start.update drag.update end.update", handle_update));
+
+function handle_dragged(event, d) {
+    d3.select(this).attr("cx", d.x = event.x);
+    if(event.x < 0){
+      d3.select(this).attr("cx", d.x = 0);
+    }else if(event.x > width){
+      d3.select(this).attr("cx", d.x = width);
+    }
+}
+
+function handle_dragended(event, d) {
+    d3.select(this).attr("stroke", "#cccccc");
+    Shiny.setInputValue(
+        "circle_clicked",
+        circles,
+        {priority: "event"}
+        );
+}
+
+function handle_update() {
+  t = handle_position[0].x * 1.0 / width;
+  slider.select(".track-inset").attr("x2",t * width);
+  slider.select(".track-overlay").attr("x1",t * width);
+  slider.select(".t").text("w: " + (t * 2).toFixed(2));
+  omega = t * 2;
+  update();
+}
+
+function onClick(){
+  if(play_button.select("text").text() == "Play"){
+    play_button.select("text").text("Pause");
+    timer = d3.interval(time_update, 50);
+  } else{
+    play_button.select("text").text("Play");
+    timer.stop();
+  }
+}
+
+function time_update(){
+  t += 0.005;
+  t = t % 1;
+  slider.select(".track-inset").attr("x2",t * width);
+  slider.select(".track-overlay").attr("x1",t * width);
+  slider.select(".t").text("w: " + (t * 2).toFixed(2));
+  handle_position[0].x = t * width;
+  handle.attr("cx", t * width);
+  omega = t * 2;
+  update();
+}
