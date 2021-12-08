@@ -24,7 +24,7 @@ var slider = svg.append("g")
 
 slider.append("text")
       .attr("class","t")
-      .attr("transform", "translate(" + width / 2 + "," + 65 + ")")
+      .attr("transform", "translate(" + width / 2 + "," + -20 + ")")
       .style("font", "25px sans-serif")
       .style("text-anchor", "middle")
       .style("user-select", "none")
@@ -32,7 +32,7 @@ slider.append("text")
 
 var play_button = slider.append("g")
       .attr("class", "button")
-      .attr("transform", "translate(0," + 40 + ")");
+      .attr("transform", "translate(0," + -40 + ")");
 
 play_button.append("text")
         .attr("x", 35)

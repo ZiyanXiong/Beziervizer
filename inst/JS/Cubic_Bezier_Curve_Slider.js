@@ -18,19 +18,49 @@ var t = 0.5;
 var handle_position = [{x: t * width, y:0}];
 
 
-  const radius = 6;
-  var midpoints;
-  var paths;
-  var midlines;
-  var circles = d3.range(4).map(i => ({
+const radius = 6;
+var midpoints;
+var paths;
+var midlines;
+var circles = d3.range(4).map(i => ({
     x: Math.random() * (width - radius * 2) + radius,
     y: Math.random() * (height - radius * 2) + radius,
     t: 0.3,
   }));
 
-  if(data.length >= 4){
-    circles = data;
+//data = circles;
+normalize_points();
+
+if(data.length >= 4){
+  circles = data;
+}
+
+function normalize_points(){
+  var average = {x:0,y:0};
+  var point_min = {x:data[0].x, y:data[0].y};
+  var point_max = {x:data[0].x, y:data[0].y};
+  for(let i = 0; i < data.length; i++){
+    average.x += data[i].x;
+    average.y += data[i].y;
+    if(data[i].x < point_min.x){
+      point_min.x = data[i].x;
+    }
+    if(data[i].x > point_max.x){
+      point_max.x = data[i].x;
+    }
+    if(data[i].y < point_min.y){
+      point_min.y = data[i].y;
+    }
+    if(data[i].y > point_max.y){
+      point_max.y = data[i].y;
+    }
   }
+
+  var offset = {x:average.x / data.length, y:average.y / data.length};
+  var unit = Math.min(width, height) * 0.8;
+  var scalar = {x:(point_max.x - point_min.x) /unit, y:(point_max.y - point_min.y) / unit};
+  data.map(function(d) {d.x = (d.x - offset.x) / scalar.x + width * 0.6; d.y = (d.y - offset.y) / scalar.y + height * 0.4});
+}
 
   function get_midpoints(){
     var p00 = {x: (1 - t) * circles[0].x + t * circles[1].x, y: (1 - t) * circles[0].y + t * circles[1].y};
@@ -178,7 +208,7 @@ var slider = svg.append("g")
 
 slider.append("text")
       .attr("class","t")
-      .attr("transform", "translate(" + width / 2 + "," + 65 + ")")
+      .attr("transform", "translate(" + width / 2 + "," + -20 + ")")
       .style("font", "25px sans-serif")
       .style("text-anchor", "middle")
       .style("user-select", "none")
@@ -186,7 +216,7 @@ slider.append("text")
 
 var play_button = slider.append("g")
       .attr("class", "button")
-      .attr("transform", "translate(0," + 40 + ")");
+      .attr("transform", "translate(0," + -40 + ")");
 
 play_button.append("text")
         .attr("x", 35)

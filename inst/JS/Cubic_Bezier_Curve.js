@@ -78,7 +78,7 @@
   function get_lines(){
     var path = d3.path();
     path.moveTo(circles[0].x, circles[0].y);
-    path.bezierCurveTo(circles[1].x, circles[1].y,circles[2].x, circles[2].y, circles[3].x, circles[3].y)
+    path.bezierCurveTo(circles[1].x, circles[1].y,circles[2].x, circles[2].y, circles[3].x, circles[3].y);
     var line0 = d3.path();
     var line1 = d3.path();
     var line2 = d3.path();
@@ -152,3 +152,4 @@
       .on("drag", dragged)
       .on("end", dragended)
       .on("start.update drag.update end.update", update));
+

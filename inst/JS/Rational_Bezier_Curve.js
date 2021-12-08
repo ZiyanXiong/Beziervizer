@@ -1,4 +1,4 @@
-// !preview r2d3 data=c(0.3, 0.6, 0.8)
+// !preview r2d3 data=c(0.3, 0.6)
 //
 // r2d3: https://rstudio.github.io/r2d3
 //
@@ -8,6 +8,14 @@ var n = 100;
 var t = 0.5;
 var omega = t * 2;
 var circles_input = [{x: 100, y:400}, {x: 300, y:600}, {x: 500, y:400}];
+
+//data = circles_input;
+normalize_points();
+
+if(data.length >= 3){
+  circles_input = data;
+}
+
 var circles = circles_input.map(d => ({x: d.y - 400, y: d.x-200, z:100}));
 circles[1].z = circles[1].z * omega;
 //var circles = [{x: 0, y:-100, z:100}, {x: 200, y:0, z:100 * omega}, {x: 0, y:100, z:100}];
@@ -28,10 +36,6 @@ var x = d3.scaleLinear()
     .clamp(true);
 
 var handle_position = [{x: t * width, y:0}];
-
-if(data.length >= 4){
-  circles = data;
-}
 
 var curve = quadratic_bezier_curve(n);
 var rational_curve = rational_bezier_curve(n, circles_input);
@@ -54,6 +58,33 @@ camera_axis.map(function(d){d.x += origin_offset.x; d.y += origin_offset.y;});
 
 
 var axis_lines = get_axis_lines();
+
+function normalize_points(){
+  var average = {x:0,y:0};
+  var point_min = {x:data[0].x, y:data[0].y};
+  var point_max = {x:data[0].x, y:data[0].y};
+  for(let i = 0; i < data.length; i++){
+    average.x += data[i].x;
+    average.y += data[i].y;
+    if(data[i].x < point_min.x){
+      point_min.x = data[i].x;
+    }
+    if(data[i].x > point_max.x){
+      point_max.x = data[i].x;
+    }
+    if(data[i].y < point_min.y){
+      point_min.y = data[i].y;
+    }
+    if(data[i].y > point_max.y){
+      point_max.y = data[i].y;
+    }
+  }
+
+  var offset = {x:average.x / data.length, y:average.y / data.length};
+  var unit = Math.min(width, height * 0.4) * 0.8;
+  var scalar = {x:(point_max.x - point_min.x) /unit, y:(point_max.y - point_min.y) / unit};
+  data.map(function(d) {d.x = (d.x - offset.x) / scalar.x + width * 0.5; d.y = (d.y - offset.y) / scalar.y + height * 0.6});
+}
 
 
 function rational_bezier_curve(n, control_points){
@@ -396,7 +427,7 @@ var slider = svg.append("g")
 
 slider.append("text")
       .attr("class","t")
-      .attr("transform", "translate(" + width / 2 + "," + 65 + ")")
+      .attr("transform", "translate(" + width / 2 + "," + -20 + ")")
       .style("font", "25px sans-serif")
       .style("text-anchor", "middle")
       .style("user-select", "none")
@@ -404,7 +435,7 @@ slider.append("text")
 
 var play_button = slider.append("g")
       .attr("class", "button")
-      .attr("transform", "translate(0," + 40 + ")");
+      .attr("transform", "translate(0," + -40 + ")");
 
 play_button.append("text")
         .attr("x", 35)
