@@ -9,7 +9,7 @@ plot_cubic_bezier(Points = NULL)
 \arguments{
 \item{Points}{The control points for a Bezier curve. The control points can be in the form of dataframe or matrix.
 If not provided, this function will plot a Bezier curve with default control points.
-If a dataframe is provided, it should has 4 rows and 2 columns and the column's name should be "x" and "y".
+If a dataframe is provided, it should have 4 rows and 2 columns and the column's name should be "x" and "y".
 If a matrix is provided, it also should have 4 rows and 2 columns. The data in first column will be the x coordinates of control points and data in the second column will be the y coordinates of control ponints.}
 }
 \description{
@@ -17,11 +17,19 @@ This function will plot an interactive Bezier curve. The blue points are the con
 The variable t controls the animation of De Casteljau's algorithm, which can be adjusted using the slider in the bottom of the plot.
 }
 \examples{
+#Plot with default control points
 plot_cubic_bezier()
 
+#Plot with dataframe as control points
 x = c(100, 200, 300, 400)
 y = c(100, 400, 100, 400)
 control_points = data.frame(x,y)
+plot_cubic_bezier(control_points)
+
+#Plot with a matrix as control points
+x = c(100, 200, 300, 400)
+y = c(100, 400, 100, 400)
+control_points = matrix(c(x,y),length(x),2)
 plot_cubic_bezier(control_points)
 
 }

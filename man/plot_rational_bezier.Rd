@@ -9,7 +9,7 @@ plot_rational_bezier(Points = NULL)
 \arguments{
 \item{Points}{The control points for a Bezier curve. The control points can be in the form of dataframe or matrix.
 If not provided, this function will plot a Bezier curve with default control points.
-If a dataframe is provided, it should has 3 rows and 2 columns and the column's name should be "x" and "y".
+If a dataframe is provided, it should have 3 rows and 2 columns and the column's name should be "x" and "y".
 If a matrix is provided, it also should have 3 rows and 2 columns. The data in first column will be the x coordinates of control points and data in the second column will be the y coordinates of control ponints.}
 }
 \description{
@@ -20,4 +20,17 @@ The variable w controls how the rational bezier curve would change from the orig
 }
 \examples{
 plot_rational_bezier()
+
+#Plot with dataframe as control points
+x = c(100, 200, 300)
+y = c(100, 400, 100)
+control_points = data.frame(x,y)
+plot_rational_bezier(control_points)
+
+#Plot with a matrix as control points
+x = c(100, 200, 300)
+y = c(100, 400, 100)
+control_points = matrix(c(x,y),length(x),2)
+plot_rational_bezier(control_points)
+
 }
