@@ -19,6 +19,7 @@ The black line is a quadratic bezier curve formed by control points and the brow
 The variable w controls how the rational bezier curve would change from the original Bezier curve, which can be adjusted using the slider in the bottom of the plot.
 }
 \examples{
+#Plot with default control points
 plot_rational_bezier()
 
 #Plot with dataframe as control points
