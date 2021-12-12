@@ -3,6 +3,8 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 
+
+// Define variables
   const radius = 6;
   var iter_times = 5;
   var circles = d3.range(20).map(i => ({
@@ -59,6 +61,7 @@
     data.map(function(d) {d.x = (d.x - offset.x) / scalar.x + width * 0.6; d.y = (d.y - offset.y) / scalar.y + height * 0.4});
   }
 
+// Response function for control points
   function dragstarted(event, d) {
     d3.select(this).raise().attr("stroke", "black");
   }
@@ -90,7 +93,7 @@
       .attr("fill", "black")
   }
 
-
+// Subdivide original Bezier Curve
   function subdivision(points){
     var n = circles.length;
     var front_points = JSON.parse(JSON.stringify(points));
@@ -122,6 +125,7 @@
   var sub_points = recursive_subdivision(circles, iter_times);
   var flattened = sub_points.reduce(function(a, b) { return a.concat(b);},[]);
 
+// Add element to svg object
   svg.append("g")
       .attr("id","bezier")
 
@@ -151,6 +155,8 @@
 
   svg.select("#bezier").raise()
 
+// Code for slider
+// Add the element for slider to svg
 
 var slider = svg.append("g")
     .attr("class", "slider")
@@ -230,6 +236,8 @@ var handle = slider.selectAll("circle")
       .on("drag", handle_dragged)
       .on("end", handle_dragended)
       .on("start.update drag.update end.update", handle_update));
+
+// Response function for slider
 
 function handle_dragged(event, d) {
     d3.select(this).attr("cx", d.x = event.x);

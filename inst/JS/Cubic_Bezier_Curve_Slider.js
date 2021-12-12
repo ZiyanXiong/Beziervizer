@@ -3,6 +3,8 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 
+
+// Define variables
 var margin = {right: 50, left: 50};
 width = svg.attr("width") - margin.left - margin.right;
 height = svg.attr("height");
@@ -62,6 +64,7 @@ function normalize_points(){
   data.map(function(d) {d.x = (d.x - offset.x) / scalar.x + width * 0.6; d.y = (d.y - offset.y) / scalar.y + height * 0.4});
 }
 
+// Calculate mide pints and lines connecting them
   function get_midpoints(){
     var p00 = {x: (1 - t) * circles[0].x + t * circles[1].x, y: (1 - t) * circles[0].y + t * circles[1].y};
     var p01 = {x: (1 - t) * circles[1].x + t * circles[2].x, y: (1 - t) * circles[1].y + t * circles[2].y};
@@ -85,6 +88,7 @@ function normalize_points(){
     midlines = [line0, line1, line2];
   }
 
+// Response functions for control points
   function dragstarted(event, d) {
     d3.select(this).raise().attr("stroke", "black");
   }
@@ -145,6 +149,7 @@ function normalize_points(){
   get_midpoints();
   get_midlines();
 
+// Add elements to svg object
   svg.append("g")
       .attr("id","bezier")
 
@@ -202,6 +207,8 @@ function normalize_points(){
       .on("end", dragended)
       .on("start.update drag.update end.update", update));
 
+// Code for slider
+// Add elements for slider to svg
 var slider = svg.append("g")
     .attr("class", "slider")
     .attr("transform", "translate(" + margin.left + "," + height * 0.9 + ")");
@@ -280,6 +287,8 @@ var handle = slider.selectAll("circle")
       .on("drag", handle_dragged)
       .on("end", handle_dragended)
       .on("start.update drag.update end.update", handle_update));
+
+// Response function for slider
 
 function dragstarted(event, d) {
     d3.select(this).raise().attr("stroke", "black");

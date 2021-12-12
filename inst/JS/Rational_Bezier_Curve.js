@@ -3,6 +3,8 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
 
+
+// Define variables
 const radius = 6;
 var n = 100;
 var t = 0.5;
@@ -37,12 +39,14 @@ var x = d3.scaleLinear()
 
 var handle_position = [{x: t * width, y:0}];
 
+// Caculate the points and lines in projective space
 var curve = quadratic_bezier_curve(n);
 var rational_curve = rational_bezier_curve(n, circles_input);
 var camera_rational_curve = rational_bezier_curve(n, circles);
 camera_rational_curve = camera_rational_curve.map(d => ({x: d.x, y: d.y, z:100}));
 camera_rational_curve = camera_rational_curve.map(multiply_camera_matrix);
 
+// Get lines on plane w = 1
 var plane = get_plane(100);
 for(let i = 0; i < plane.length; i++){
   plane[i] = plane[i].map(multiply_camera_matrix);
@@ -122,6 +126,7 @@ function get_axis_lines(){
     return axis_lines = [line0, line1, line2];
 }
 
+// Map a point to projective space
 function multiply_camera_matrix(point){
   var camera_point = {x: 0, y:0, w:0};
   var w;
@@ -132,7 +137,7 @@ function multiply_camera_matrix(point){
   return camera_point;
 }
 
-
+// Generate qurdratic bezier curve
 function quadratic_bezier_curve(n) {
   var quadratic_curve = d3.range(n).map(i => ({
     x: Math.pow((1 - i / n),2) * circles[0].x + 2 * (1 - i / n) * (i / n) * circles[1].x + Math.pow(i / n, 2) * circles[2].x,
@@ -142,6 +147,7 @@ function quadratic_bezier_curve(n) {
   return quadratic_curve;
 }
 
+// Response function for control points
 function dragstarted(event, d) {
   d3.select(this).raise().attr("stroke", "black");
 }
@@ -162,6 +168,8 @@ function dragended(event, d) {
   d3.select(this).attr("stroke", null);
 }
 
+
+// Update function for user input response
 function update() {
   var new_bezier = d3.path();
   new_bezier.moveTo(circles_input[0].x, circles_input[0].y);
@@ -250,6 +258,7 @@ path.moveTo(circles_input[0].x, circles_input[0].y);
 path.quadraticCurveTo(circles_input[1].x, circles_input[1].y,circles_input[2].x, circles_input[2].y);
 paths = [path]
 
+// Add elements to svg Object
 svg.append("g")
     .attr("id","bezier");
 
@@ -337,7 +346,6 @@ var axis_nodes = svg.select("#axis").selectAll("path")
 d3.select(axis_nodes.nodes()[1]).attr("stroke", "blue");
 d3.select(axis_nodes.nodes()[2]).attr("stroke", "#FFBF00");
 
-
 svg.select("#curve_cam").selectAll("line")
     .data(camera_curve)
     .join("line")
@@ -420,7 +428,9 @@ svg.select("#intersects").raise();
 svg.select("#bezier").raise();
 
 
+// Code for Sliders
 
+// Add elements to svg Object
 var slider = svg.append("g")
     .attr("class", "slider")
     .attr("transform", "translate(" + margin.left + "," + height * 0.9 + ")");
@@ -486,6 +496,7 @@ slider.insert("g")
     .style("user-select", "none")
     .text(function(d) { return d; });
 
+// Create Handle
 var handle = slider.selectAll("circle")
     .data(handle_position)
     .join("circle")
@@ -500,6 +511,7 @@ var handle = slider.selectAll("circle")
       .on("end", handle_dragended)
       .on("start.update drag.update end.update", handle_update));
 
+// Handle behaveior functions
 function handle_dragged(event, d) {
     d3.select(this).attr("cx", d.x = event.x);
     if(event.x < 0){
