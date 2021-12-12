@@ -1,0 +1,164 @@
+---
+title: "Visualize and plot interactive Bezier Curves with Beziervizer"
+author: Ziyan Xiong
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualize and plot interactive Bezier Curves with Beziervizer}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+Beziervizer is an R package for plotting interactive [Bézier curves](https://en.wikipedia.org/wiki/B%C3%A9zier_curve). Users can move the control points of plotted result at will and the curve will transform accordingly. This package also includes functions to demonstrate the properties of Bézier curves such as De Casteljau's algorithm and rational Bézier curves in an interactive way.
+
+# Plot an interactive Bézier curve
+
+The fastest way to get an interactive Bézier curve is calling function `plot_cubic_bezier()` as follows:
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{css, echo=FALSE}
+.center {
+  display: table;
+  margin-right: auto;
+  margin-left: auto;
+}
+```
+
+```{r setup}
+library(Beziervizer)
+```
+
+
+```{r cubic_bezier, results='hide', message=FALSE}
+#Plot a cubic bezier curve with default control points
+plot_cubic_bezier()
+```
+
+<div class = 'center'>
+```{r cubic_bezier, out.width="400px", out.height="400px", echo = F}
+```
+</div>
+
+In the interactive plot above, users can drag the control points (the blue points) at will and observe how the black Bézier curves transform according to these control points.
+
+Users can also use their own control points to initialize the Bézier curves. The `plot_cubic_bezier()` also accepts dataframe and matrix as input. Here is a dataframe input example below.
+
+```{r user_input, results='hide', message=FALSE}
+#Plot a bezier curve with a dataframe as control points
+x = c(200, 400, 100, 300)
+y = c(500, 300, 300, 500)
+control_points = data.frame(x,y)
+plot_cubic_bezier(control_points)
+```
+
+<div class = 'center'>
+```{r user_input, out.width="400px", out.height="400px", echo = F}
+```
+</div>
+
+One thing about the coordinates of control points is that the shape of a Bézier curve formed by a set of control points is determined by the relative position of control points. Therefore, the value of control points' coordinates is less important. The function `plot_cubic_bezier()` will resize the input control points to suitable size to display automatically. The coordinates in the example below will generate the same Bézier curve as the example above.
+
+```{r , results='hide', message=FALSE}
+#Plot a bezier curve with a dataframe as control points
+x = c(0, 2, -1, 1)
+y = c(5, 3, 3, 5)
+control_points = data.frame(x,y)
+plot_cubic_bezier(control_points)
+```
+
+## De Casteljau's Algorithm
+
+[De Casteljau's Algorithm](https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm) introduces a way to draw Bézier curves without calculating the coordinates of points on the Bézier curves explicitly. The slider in the bottom of the plot controls the parameter `t` in calculating the position of points on a Bézier curve.
+
+```{r de_castlejau, results='hide', message=FALSE}
+#Plot a bezier curve with  with a matrix as control points
+x = c(100, 200, 300, 400)
+y = c(500, 200, 300, 600)
+control_points = matrix(c(x,y),length(x),2)
+plot_cubic_bezier(control_points)
+```
+
+<div class = 'center'>
+```{r de_castlejau, out.width="400px", out.height="400px", echo = F}
+```
+</div>
+
+Let's denote the blue control points as $P_{00}, P_{10}, P_{20}, P_{30}$, the yellow points as $P_{01}, P_{11}, P_{21}$, the red points as $P_{02}, P_{12}$ and finally the black point on Bézier curve as $P_{03}$. De Casteljau's Algorithm get $P_{03}$ from $P_{00}, P_{10}, P_{20}, P_{30}$ by performing following operation recursively.
+
+\[ P_{ij} = P_{i(j-1)}(1-t) + P_{(i+1)(j-1)}t\]
+
+The animation of this process in shown in the interactive plot above. Users can drag the handle to see the how the black point on the Bézier curve will move following the change of `t`. Users can also click the Play button to see it increases automatically.
+
+An important property of the intermediate points generated in the process of De Casteljau's Algorithm is that $P_{00},P_{01},P_{02},P_{03}$ form the control points for the Bézier curve from $P_{00}$ to $P_{03}$ and $P_{03},P_{10},P_{21},P_{30}$ form the control points for the Bézier curve from $P_{03}$ to $P_{30}$. To make it easier to see, if you find the first and last points of each color and connect them following the order of "blue, yellow, red, black", you will get the new control points for the front and back part of the Bézier curve divided by the black point respectively. This property is the key to calculate high order Bézier curve effectively in next part.
+
+# Plot a high order interactive Bézier curve
+The function `plot_high_order_bezier()` subdivide the original Bézier curve several times using the De Casteljau's Algorithm discussed above and plot the control points as the points on Bézier curve. From last plot we can see that only after one subdivision, the control points are close to the original points. The results of plotting 12 order Bézier curve is shown as follows:
+```{r high_order, results='hide', message=FALSE}
+#Plot a 12 order bezier curve with random control points
+plot_high_order_bezier(12)
+```
+
+<div class = 'center'>
+```{r high_order, out.width="600px", out.height="600px", echo = F}
+```
+</div>
+
+The slider in the bottom of the plot controls the number of subdivisions applied to the original Bézier curve. It is not hard to see that as the iterate times increase, the number of points increases and the shape of the curve they form does not change, which demonstrate that for high order Bézier curves performing the subdivision based on the De Casteljau's Algorithm 3 times the generated control points is close enough to represent the original curve. 
+
+To plot high order Bézier curves with specific input as control points, users can pass a dataframe or a matrix to the function `plot_high_order_bezier()`. The matrix input example is as below.
+```{r user_high_order, results='hide', message=FALSE}
+#Plot with a matrix as control points
+x = c(100, 200, 300, 400, 500, 0, 150, 400)
+y = c(100, 400, 100, 400, 700, 300, 200, 500)
+control_points = matrix(c(x,y),length(x),2)
+plot_high_order_bezier(control_points)
+```
+
+<div class = 'center'>
+```{r user_high_order, out.width="600px", out.height="600px", echo = F}
+```
+</div>
+
+Like function `plot_cubic_bezier()`, `plot_high_order_bezier()` also automatically resize the control points to suitable size for displaying.
+
+# Plot rational Bézier curve
+[Rational Bézier curves](https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/spline/NURBS/RB.html) add weights to control points to provide more freedom in shape approximation. The expression for a rational quadratic Bézier curve is:
+\[P(t) = \frac{(1-t)^2P_0 + 2wt(1-t)P_1 + t^2P_2}{(1-t)^2 + 2wt(1-t) + t^2}\]
+Function `plot_rational_bezier()` will plot an interactive rational Bézier curve as below.
+
+```{r rational_bezier, results='hide', message=FALSE}
+#Plot with default control points
+plot_rational_bezier()
+```
+
+<div class = 'center'>
+```{r rational_bezier, out.width="600px", out.height="800px", echo = F}
+```
+</div>
+
+In the upper part of the plot, this Bézier curve in projective space is shown. Parameter `w` in the expression controls the $w$ coordinates of control points. The plane in the plot is $w = 1$ and because the coefficients of $P_0$ and $P_2$ are the same as a quadratic Bézier curve, they will always stay on the $w = 1$ plane. The coefficient of $P_1$ is adjusted by `w`, so it will be higher or lower than the $w = 1$ plane. The dotted line is the intersects of the line connecting origin and points on the curve with the $w = 1$ plane, which is our rational Bézier curve. Users can use the slider in the bottom of the plot to control the change of Parameter `w` and see how the rational Bézier curve and Bézier curve in projective space will change.
+
+The Bézier curve and rational Bézier curve in 2D space is shown in the middle part of plot. Users can drag the blue control points and both the Bézier curve and rational Bézier curve will transfom accordingly. 
+
+Like previous functions, this funciton also support user input as dataframe of matrix. Note that the dataframes and martix as the input should have exactly 3 rows and 2 columns since quadratic Bézier curves only need 3 control points and it also automatically resize the control points to suitable size for displaying. Here is an example below.
+
+```{r user_rational_bezier, results='hide', message=FALSE}
+#Plot with default control points
+x = c(300, 100, 300)
+y = c(100, 300, 500)
+control_points = data.frame(x,y)
+plot_rational_bezier(control_points)
+```
+
+<div class = 'center'>
+```{r user_rational_bezier, out.width="600px", out.height="800px", echo = F}
+```
+</div>
