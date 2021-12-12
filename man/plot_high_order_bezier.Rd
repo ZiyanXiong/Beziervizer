@@ -19,7 +19,7 @@ This high order Bezier curve is obtained by subdividing the original Bezier curv
 The variable Iterate times controls how many times the De Casteljau's algorithm will be performed, which can be adjusted using the slider in the bottom of the plot.
 }
 \examples{
-#Plot with default control points
+#Plot with 20 random control points
 plot_high_order_bezier()
 
 #Plot with a dataframe as control points

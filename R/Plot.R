@@ -87,7 +87,7 @@ plot_cubic_bezier <- function(Points = NULL)
 #' @export
 #'
 #' @examples
-#' #Plot with default control points
+#' #Plot with 20 random control points
 #' plot_high_order_bezier()
 #'
 #' #Plot with a dataframe as control points
@@ -164,7 +164,7 @@ plot_high_order_bezier <- function(Points = NULL)
 #' If a dataframe is provided, it should have 3 rows and 2 columns and the column's name should be "x" and "y".
 #' If a matrix is provided, it also should have 3 rows and 2 columns. The data in first column will be the x coordinates of control points and data in the second column will be the y coordinates of control ponints.
 #'
-#' @description This function will plot an interactive rational quadratic bezier curve. The upper part of the plot this bezier curve in rational space.
+#' @description This function will plot an interactive rational quadratic bezier curve. The upper part of the plot is this bezier curve in rational space.
 #' The middle part is this curve in 2D space. Blue points are the control points for bezier curve, which can be dragged at will.
 #' The black line is a quadratic bezier curve formed by control points and the brown line is the rational bezier curve.
 #' The variable w controls how the rational bezier curve would change from the original Bezier curve, which can be adjusted using the slider in the bottom of the plot.
